@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from mayavi import mlab
 
-path = 'C:/Users/jmayhall/Downloads/aes740_project/cm1out_icehurr.nc'
+path = 'C:/Users/jmayhall/Downloads/aes740_project/cm1out_liqhurr.nc'
 
 data_qv = np.array(netCDF4.Dataset(path).variables.get('qv'))
 data_ql = np.array(netCDF4.Dataset(path).variables.get('ql'))
