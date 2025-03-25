@@ -2,83 +2,70 @@
 """
 @author: John Mark Mayhall
 """
-import glob
 import os
 
-import matplotlib.pyplot as plt
 import netCDF4
 import numpy as np
-import pandas as pd
 from mayavi import mlab
 
-path = 'C:/Users/jmayhall/Downloads/aes740_project/cm1out_liqhurr.nc'
+# Define paths
+nc_path = "C:/Users/jmayhall/Downloads/aes740_project/cm1out_liqhurr.nc"
+output_dir = "C:/Users/jmayhall/Downloads/aes740_project/liq_photos"
 
-data_qv = np.array(netCDF4.Dataset(path).variables.get('qv'))
-data_ql = np.array(netCDF4.Dataset(path).variables.get('ql'))
-data_th = np.array(netCDF4.Dataset(path).variables.get('th'))
-data_rho = np.array(netCDF4.Dataset(path).variables.get('rho'))
-data_tke = np.array(netCDF4.Dataset(path).variables.get('tke'))
+# Variables to process
+variables_to_plot = ["qv", "ql", "th", "rho"]
 
-for i in range(data_qv.shape[0]):
-    qv_data = data_qv[i, :, :, :]
-    qv_data = qv_data.swapaxes(0, 2)
+# Ensure output directories exist
+for var in variables_to_plot:
+    os.makedirs(os.path.join(output_dir, var), exist_ok=True)
 
-    # dbz_data = data_dbz[i, :, :, :]
-    # dbz_data = dbz_data.swapaxes(0, 2)
+# Load dataset once
+dataset = netCDF4.Dataset(nc_path)
 
-    ql_data = data_ql[i, :, :, :]
-    ql_data = ql_data.swapaxes(0, 2)
+# Extract variables into a dictionary
+variables = {var: np.array(dataset.variables.get(var)) for var in variables_to_plot}
+tke_data = np.array(dataset.variables.get("tke"))  # TKE is used in all plots
 
-    th_data = data_th[i, :, :, :]
-    th_data = th_data.swapaxes(0, 2)
 
-    rho_data = data_rho[i, :, :, :]
-    rho_data = rho_data.swapaxes(0, 2)
+# Function to process and swap axes
+def process_data(data: np.array) -> np.array:
+    """
+    Function for converting data to x, y, z format.
+    :param data: Data array in the format z, y, x.
+    :return: Data array in the format x, y, z.
+    """
+    return data.swapaxes(0, 2)
 
-    tke_data = data_tke[i, :, :, :]
-    tke_data = tke_data.swapaxes(0, 2)
 
+# Function to plot and save figures
+def plot_contour3d(base_data: np.array, overlay_data: np.array, var_name: str, timestep: int) -> None:
+    """
+    Function for plotting array data.
+    :param base_data: The data being plotted.
+    :param overlay_data: Data being plotted over the TKE data.
+    :param var_name: The variable being plotted.
+    :param timestep: The timestep being plotted.
+    :return:
+    """
     fig = mlab.figure(size=(1024, 1024))
-    s = mlab.contour3d(tke_data, contours=10, colormap='Greys')
-    v = mlab.contour3d(qv_data, contours=25, colormap='jet', opacity=0.5)
-    mlab.axes(xlabel='x', ylabel='y', zlabel='z')
+    s = mlab.contour3d(base_data, contours=10, colormap="Greys")
+    v = mlab.contour3d(overlay_data, contours=25, colormap="jet", opacity=0.5)
+    mlab.axes(xlabel="x", ylabel="y", zlabel="z")
     mlab.outline(s)
-    mlab.savefig(f'C:/Users/jmayhall/Downloads/aes740_project/ice_photos/qv/qv_tke_timestep{i}.png')
+
+    save_path = os.path.join(output_dir, var_name, f"{var_name}_tke_timestep{timestep}.png")
+    mlab.savefig(save_path)
+
+    # Clean up
     mlab.close(all=True)
     mlab.clf()
 
-    # fig = mlab.figure(size=(1024, 1024))
-    # s = mlab.contour3d(tke_data, contours=10, colormap='Greys')
-    # v = mlab.contour3d(dbz_data, contours=25, colormap='jet', opacity=0.5)
-    # mlab.axes(xlabel='x', ylabel='y', zlabel='z')
-    # mlab.outline(s)
-    # mlab.savefig(f'C:/Users/jmayhall/Downloads/aes740_project/ice_photos/dbz/dbz_tke_timestep{i}.png')
-    # mlab.close(all=True)
-    # mlab.clf()
 
-    fig = mlab.figure(size=(1024, 1024))
-    s = mlab.contour3d(tke_data, contours=10, colormap='Greys')
-    v = mlab.contour3d(ql_data, contours=25, colormap='jet', opacity=0.5)
-    mlab.axes(xlabel='x', ylabel='y', zlabel='z')
-    mlab.outline(s)
-    mlab.savefig(f'C:/Users/jmayhall/Downloads/aes740_project/ice_photos/ql/ql_tke_timestep{i}.png')
-    mlab.close(all=True)
-    mlab.clf()
+# Iterate over time steps
+num_timesteps = tke_data.shape[0]
+for i in range(num_timesteps):
+    tke_frame = process_data(tke_data[i])
 
-    fig = mlab.figure(size=(1024, 1024))
-    s = mlab.contour3d(tke_data, contours=10, colormap='Greys')
-    v = mlab.contour3d(th_data, contours=25, colormap='jet', opacity=0.5)
-    mlab.axes(xlabel='x', ylabel='y', zlabel='z')
-    mlab.outline(s)
-    mlab.savefig(f'C:/Users/jmayhall/Downloads/aes740_project/ice_photos/th/th_tke_timestep{i}.png')
-    mlab.close(all=True)
-    mlab.clf()
-
-    fig = mlab.figure(size=(1024, 1024))
-    s = mlab.contour3d(tke_data, contours=10, colormap='Greys')
-    v = mlab.contour3d(rho_data, contours=25, colormap='jet', opacity=0.5)
-    mlab.axes(xlabel='x', ylabel='y', zlabel='z')
-    mlab.outline(s)
-    mlab.savefig(f'C:/Users/jmayhall/Downloads/aes740_project/ice_photos/rho/rho_tke_timestep{i}.png')
-    mlab.close(all=True)
-    mlab.clf()
+    for var in variables_to_plot:
+        var_frame = process_data(variables[var][i])
+        plot_contour3d(tke_frame, var_frame, var, i)
