@@ -15,7 +15,7 @@ from mayavi import mlab
 from metpy.units import units
 
 # Define paths
-data_path = Path("input_sounding_ice")
+data_path = Path("input_sounding_liq")
 nc_file = Path("C:/Users/jmayhall/Downloads/aes740_project/cm1out_thompson.nc")
 output_dir = Path("C:/Users/jmayhall/Downloads/aes740_project/thompson_photos/af")
 output_dir.mkdir(parents=True, exist_ok=True)  # Ensure output directory exists
@@ -57,8 +57,10 @@ for i in range(ql.shape[0]):
     fig = mlab.figure(size=(1024, 1024))
     tke_data = tke[i, :, :, :].swapaxes(0, 2)
 
-    s = mlab.contour3d(tke_data, contours=10, colormap="Greys")
-    v = mlab.contour3d(current_data, contours=100, colormap="jet", opacity=0.5, vmax=100)
+    s = mlab.contour3d(tke_data, contours=10, colormap="Greys",
+                       extent=[np.min(x), np.max(x), np.min(y), np.max(y), np.min(z), np.max(z)])
+    v = mlab.contour3d(current_data, contours=100, colormap="jet", opacity=0.5, vmax=100,
+                       extent=[np.min(x), np.max(x), np.min(y), np.max(y), np.min(z), np.max(z)])
 
     mlab.axes(xlabel="x", ylabel="y", zlabel="z")
     mlab.colorbar(object=v, title="Adiabatic Fraction", label_fmt="%.4f", nb_labels=4)
