@@ -51,8 +51,8 @@ def plot_contour3d(base_data: np.array, overlay_data: np.array, var_name: str, t
     :return:
     """
     fig = mlab.figure(size=(1024, 1024))
-    s = mlab.contour3d(base_data, contours=10, colormap="Greys", extent=extent)
-    v = mlab.contour3d(overlay_data, contours=25, colormap="jet", opacity=0.25, extent=extent)
+    s = mlab.contour3d(base_data, contours=50, colormap="Greys", extent=extent)
+    v = mlab.contour3d(overlay_data, contours=50, colormap="jet", opacity=0.25, extent=extent)
     mlab.colorbar(object=v, title=f'{units.get(var_name)}', label_fmt='%.5f', nb_labels=4)
     mlab.axes(xlabel="x (km)", ylabel="y (km)", zlabel="z (km)")
     mlab.outline(v)
@@ -73,7 +73,7 @@ for i in range(num_timesteps):
     for var in variables_to_plot[: -3]:
         var_frame = process_data(variables[var][i])
         extent = [np.min(variables['xh']), np.max(variables['xh']), np.min(variables['yh']),
-                  np.max(variables['yh']), np.min(variables['zh']), np.max(variables['zh'])]
+                  np.max(variables['yh']), 0, 25]
         plot_contour3d(tke_frame, var_frame, var, i, extent, units)
 
     co_occ.append(np.sum((variables['qi'][i, :, :, :].swapaxes(0, 2) != 0) & (tke_frame[:, :, :-1] != 0)).astype(int))
