@@ -16,8 +16,8 @@ from metpy.units import units
 
 # Define paths
 data_path = Path("input_sounding_ice")
-nc_file = Path("C:/Users/jmayhall/Downloads/aes740_project/cm1out_icehurr.nc")
-output_dir = Path("C:/Users/jmayhall/Downloads/aes740_project/ice_photos/af")
+nc_file = Path("C:/Users/jmayhall/Downloads/aes740_project/cm1out_icehurr_ext.nc")
+output_dir = Path("C:/Users/jmayhall/Downloads/aes740_project/ice_ext_photos/af")
 output_dir.mkdir(parents=True, exist_ok=True)  # Ensure output directory exists
 
 # Read sounding data
@@ -67,7 +67,7 @@ for i in range(ql.shape[0]):
     mlab.colorbar(object=v, title="Adiabatic Fraction (%)", label_fmt="%.2f", nb_labels=4)
     mlab.outline(s)
 
-    mlab.savefig(f"C:/Users/jmayhall/Downloads/aes740_project/ice_photos/af/af_{i}.png")
+    mlab.savefig(f"C:/Users/jmayhall/Downloads/aes740_project/ice_ext_photos/af/af_{i}.png")
 
     # Cleanup
     mlab.close(all=True)

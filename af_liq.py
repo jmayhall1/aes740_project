@@ -1,7 +1,7 @@
 # coding=utf-8
 """
+Last Edited: 04/09/2025
 @author: John Mark Mayhall
-Code for homework 3 in AES 740
 """
 import os
 from pathlib import Path
@@ -36,10 +36,10 @@ td_surface = mpcalc.dewpoint_from_specific_humidity(p_surface, surface.qv.values
 
 # Open NetCDF dataset
 with netCDF4.Dataset(nc_file) as nc:
-    x, y, z = (np.array(nc.variables[var]) for var in ["xh", "yh", "zh"])
-    ql = np.array(nc.variables['ql'])
-    model_z = np.array(nc.variables["zh"])
-    tke = np.array(nc.variables["tke"])  # TKE is used in all plots
+    x, y, z = (np.asarray(nc.variables[var]) for var in ["xh", "yh", "zh"])
+    ql = np.asarray(nc.variables['ql'])
+    model_z = np.asarray(nc.variables["zh"])
+    tke = np.asarray(nc.variables["tke"])  # TKE is used in all plots
 
 # Compute pressure levels and parcel profile
 model_p = mpcalc.height_to_pressure_std(model_z * units.kilometers)
@@ -53,7 +53,7 @@ qla = np.maximum(surface.qv.values[0] / 1000 - parcel_mixing_ratio.magnitude, 0)
 for i in range(ql.shape[0]):
     current_data = np.divide(ql[i, :, :, :].swapaxes(0, 2), qla, where=qla != 0) * 100  # Avoid division by zero
 
-    fig = mlab.figure(size=(1024, 1024))
+    fig = mlab.figure(size=(1500, 1000))
     tke_data = tke[i, :, :, :].swapaxes(0, 2)
 
     s = mlab.contour3d(tke_data, contours=10, colormap="Greys",
