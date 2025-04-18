@@ -16,8 +16,8 @@ from metpy.units import units
 
 # Define paths
 data_path = Path("input_sounding_ice")
-nc_file = Path("C:/Users/jmayhall/Downloads/aes740_project/no_tke/cm1out_icehighres.nc")
-output_dir = Path("C:/Users/jmayhall/Downloads/aes740_project/no_tke/highres_photos/af")
+nc_file = Path("C:/Users/jmayhall/Downloads/aes740_project/cm1out_icehurr_ext.nc")
+output_dir = Path("C:/Users/jmayhall/Downloads/aes740_project/ice_ext_photos/af")
 output_dir.mkdir(parents=True, exist_ok=True)  # Ensure output directory exists
 
 # Read sounding data
@@ -30,9 +30,8 @@ surface.columns = ["Pressure", "Potential Temp", "qv"]
 
 # Surface pressure and temperature calculations
 p_surface = surface.Pressure.values[0] * units.hectopascals
-t_surface = mpcalc.temperature_from_potential_temperature(p_surface,
-                                                          surface["Potential Temp"].values[0] * units.kelvin).to(
-    units.celsius)
+t_surface = mpcalc.temperature_from_potential_temperature(p_surface, surface["Potential Temp"].values[0] *
+                                                          units.kelvin).to(units.celsius)
 td_surface = mpcalc.dewpoint_from_specific_humidity(p_surface, surface.qv.values[0] * units("g/kg"))
 
 # Open NetCDF dataset
@@ -59,14 +58,16 @@ for i in range(ql.shape[0]):
     fig = mlab.figure(size=(1500, 1000))
     tke_data = tke[i, :, :, :].swapaxes(0, 2)
 
-    v = mlab.contour3d(current_data, contours=100, colormap="jet", vmax=100,
+    s = mlab.contour3d(tke_data, contours=10, colormap="Greys",
+                       extent=[np.min(x), np.max(x), np.min(y), np.max(y), 0, 25])
+    v = mlab.contour3d(current_data, contours=100, colormap="jet", opacity=0.5, vmax=100,
                        extent=[np.min(x), np.max(x), np.min(y), np.max(y), 0, 25])
 
     mlab.axes(xlabel="x (km)", ylabel="y (km)", zlabel="z (km)")
     mlab.colorbar(object=v, title="Adiabatic Fraction (%)", label_fmt="%.2f", nb_labels=4)
-    mlab.outline(v)
+    mlab.outline(s)
 
-    mlab.savefig(f"C:/Users/jmayhall/Downloads/aes740_project/no_tke/highres_photos/af/af_{i}.png")
+    mlab.savefig(f"C:/Users/jmayhall/Downloads/aes740_project/ice_ext_photos/af/af_{i}.png")
 
     # Cleanup
     mlab.close(all=True)

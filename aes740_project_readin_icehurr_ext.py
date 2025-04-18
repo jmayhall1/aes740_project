@@ -11,8 +11,8 @@ import numpy as np
 from mayavi import mlab
 
 # Define file paths
-nc_path = "C:/Users/jmayhall/Downloads/aes740_project/cm1out_icehurr_ext.nc"
-output_dir = "C:/Users/jmayhall/Downloads/aes740_project/ice_ext_photos"
+nc_path = "C:/Users/jmayhall/Downloads/aes740_project/no_tke/cm1out_icehurr_ext.nc"
+output_dir = "C:/Users/jmayhall/Downloads/aes740_project/no_tke/ice_ext_photos"
 
 # Ensure output directories exist
 variables_to_plot = ["qv", "dbz", "qi", "th", "rho", "xh", "yh", "zh"]
@@ -53,8 +53,7 @@ def plot_contour3d(base_data: np.array, overlay_data: np.array, var_name: str, t
     :return:
     """
     fig = mlab.figure(size=(1500, 1000))
-    s = mlab.contour3d(base_data, contours=50, colormap="Greys", extent=extent)
-    v = mlab.contour3d(overlay_data, contours=50, colormap="jet", opacity=0.25, extent=extent)
+    v = mlab.contour3d(overlay_data, contours=50, colormap="jet", extent=extent)
     mlab.colorbar(object=v, title=f'{units.get(var_name)}', label_fmt='%.5f', nb_labels=4)
     mlab.axes(xlabel="x (km)", ylabel="y (km)", zlabel="z (km)")
     mlab.outline(v)
