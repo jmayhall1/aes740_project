@@ -10,12 +10,13 @@ import numpy as np
 from mayavi import mlab
 
 # Define paths
-nc_path = "C:/Users/jmayhall/Downloads/aes740_project/cm1out_liqhurr.nc"
-output_dir = "C:/Users/jmayhall/Downloads/aes740_project/liq_photos"
+nc_path = "C:/Users/jmayhall/Downloads/aes740_project/tke/cm1out_liqhurr.nc"
+output_dir = "C:/Users/jmayhall/Downloads/aes740_project/tke/liq_photos"
 
 # Variables to process
 variables_to_plot = ["qv", "ql", "th", "rho", "xh", "yh", "zh"]
-units_out = {'qv': 'kg/kg', 'ql': 'kg/kg', 'th': 'K', 'rho': 'kg/m^3'}
+units_out = {'qv': 'Water Vapor Mixing Ratio (kg/kg)', 'ql': 'Liquid Water Mixing Ratio (kg/kg)',
+             'th': 'Potential Temperature (K)', 'rho': 'Dry Air Density (kg/m^3)'}
 
 # Ensure output directories exist
 for var in variables_to_plot[: -3]:
@@ -55,9 +56,12 @@ def plot_contour3d(base_data: np.array, overlay_data: np.array, var_name: str, t
     fig = mlab.figure(size=(1500, 1000))
     s = mlab.contour3d(base_data, contours=50, colormap="Greys", extent=extent)
     v = mlab.contour3d(overlay_data, contours=50, colormap="jet", opacity=0.25, extent=extent)
-    mlab.colorbar(object=v, title=f'{units.get(var_name)}', label_fmt='%.5f', nb_labels=4)
+    ax = mlab.axes()
+    ax.axes.font_factor = 1
     mlab.axes(xlabel="x (km)", ylabel="y (km)", zlabel="z (km)")
     mlab.outline(v)
+    mlab.colorbar(object=v, label_fmt='%.4f', nb_labels=3)
+    mlab.title(f'{units.get(var_name)} at Hour {timestep * 6}', size=0.5)
 
     save_path = os.path.join(output_dir, var_name, f"{var_name}_tke_timestep{timestep}.png")
     mlab.savefig(save_path)
